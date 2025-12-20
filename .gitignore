@@ -1,0 +1,5 @@
+UNet/data/
+carvana-image-masking-challenge/
+UNet/__pycache__/
+*.jpg
+*.zip

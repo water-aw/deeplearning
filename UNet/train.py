@@ -64,4 +64,4 @@ if __name__ == "__main__":
     main()
 
 
-# python train.py --loss bce+dice --epochs 50 --batch 4
+# python deeplearning\UNet\train.py --loss bce+dice --epochs 50 --batch 4

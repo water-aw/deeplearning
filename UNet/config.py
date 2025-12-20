@@ -1,5 +1,5 @@
 class cfg:
-    data_root = "./data"
+    data_root = r"deeplearning\UNet\data"
     in_channels = 3
     num_classes = 1       # >1 时用 CE/softmax
     base_channels = 64
