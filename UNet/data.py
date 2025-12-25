@@ -1,5 +1,7 @@
 from torch.utils.data import Dataset
 from torchvision import transforms
+from torchvision.transforms import functional as F
+from torchvision.transforms import InterpolationMode
 from PIL import Image
 from pathlib import Path
 import os
@@ -11,6 +13,7 @@ class SegDataset(Dataset):
         self.ids = sorted(os.listdir(self.img_dir))
         self.is_multiclass = is_multiclass
         self.num_classes = num_classes
+        self.size = (1918, 1280)  # (H, W)
         self.tfm = transforms.Compose([
             transforms.ToTensor(),
             # 可加随机增强
@@ -23,6 +26,8 @@ class SegDataset(Dataset):
         img = Image.open(self.img_dir / name).convert("RGB")
         mask_path = self._find_mask(name)
         mask = Image.open(mask_path)
+        img = F.resize(img, self.size)
+        mask = F.resize(mask, self.size, interpolation=InterpolationMode.NEAREST)
         img = self.tfm(img)
         mask = transforms.ToTensor()(mask)
         if self.is_multiclass:
