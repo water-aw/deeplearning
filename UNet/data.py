@@ -18,6 +18,7 @@ class SegDataset(Dataset):
             transforms.ToTensor(),
             # 可加随机增强
         ])
+        self.ids = self.ids[:10]
 
     def __len__(self): return len(self.ids)
 

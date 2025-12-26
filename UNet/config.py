@@ -7,6 +7,7 @@ class cfg:
     lr = 1e-3
     epochs = 50
     num_workers = 4
-    loss_name = "bce+dice"
+    loss_name = "bce"
     lr_step = 20
     lr_gamma = 0.5
+    pos_weight = 3.75     # foreground weight for BCE (binary)

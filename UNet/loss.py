@@ -9,16 +9,21 @@ def dice_loss(logits, targets, eps=1e-6):
     dice = (2*inter + eps) / (union + eps)
     return 1 - dice.mean()
 
-def build_loss(name, **kwargs):
+def build_loss(name, pos_weight=None, **kwargs):
     name = name.lower()
     if name == "bce":
+        if pos_weight is not None:
+            return nn.BCEWithLogitsLoss(pos_weight=pos_weight)
         return nn.BCEWithLogitsLoss()
     if name == "ce":
         return nn.CrossEntropyLoss()
     if name == "dice":
         return dice_loss
     if name == "bce+dice":
-        bce = nn.BCEWithLogitsLoss()
+        if pos_weight is not None:
+            bce = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+        else:
+            bce = nn.BCEWithLogitsLoss()
         def loss_fn(logits, targets):
             return bce(logits, targets.float()) + dice_loss(logits, targets)
         return loss_fn

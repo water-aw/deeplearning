@@ -68,9 +68,17 @@ def main():
     model = UNet(n_channels=cfg.in_channels, n_classes=cfg.num_classes, base_c=cfg.base_channels).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg.lr_step, gamma=cfg.lr_gamma)
-    loss_fn = build_loss(args.loss)
+    pos_weight = None
+    if cfg.num_classes == 1 and hasattr(cfg, "pos_weight"):
+        pos_weight = torch.tensor([cfg.pos_weight], device=device)
+    loss_fn = build_loss(args.loss, pos_weight=pos_weight)
 
     best_dice = 0.0
+    cfg_dict = {
+        k: getattr(cfg, k)
+        for k in dir(cfg)
+        if not k.startswith("_") and not callable(getattr(cfg, k))
+    }
     writer = None
     if SummaryWriter is not None:
         run_name = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -88,7 +96,7 @@ def main():
         print(f"Epoch {epoch+1}: train {tr_loss:.4f} | val {va_loss:.4f} | dice {va_dice:.4f} | iou {va_iou:.4f}")
         if va_dice > best_dice:
             best_dice = va_dice
-            torch.save({"model": model.state_dict(), "cfg": dict(cfg.__dict__)}, "best.pt")
+            torch.save({"model": model.state_dict(), "cfg": cfg_dict}, "best.pt")
     if writer is not None:
         writer.close()
 
